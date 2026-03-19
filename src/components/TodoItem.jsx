@@ -1,7 +1,7 @@
 function TodoItem({ item, deleteTodo, toggleTodo }) {
     return (
         <li key={item.id} style={{ textDecoration: item.completed ? 'line-through' : 'none' }}>
-            <input type="checkbox" checked={item.completed} onChange={() => toggleTodo(item.id)} />
+            <input type="checkbox" onChange={() => toggleTodo(item.id)} checked={item.completed} />
             <span>
                 {item.id} / {item.todo}
             </span>

@@ -31,8 +31,11 @@ function App() {
     }
 
     const deleteTodo = (selectedId) => {
-        const nextState = todos.filter((item) => item.id !== selectedId)
-        setTodos(nextState)
+        fetch(`https://dummyjson.com/todos/${selectedId}`, {
+            method: 'DELETE',
+        })
+            .then((res) => res.json())
+            .then(console.log)
     }
 
     const toggleTodo = (selectedId) => {
