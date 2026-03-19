@@ -1,49 +1,49 @@
-import { useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import TodoForm from './components/TodoForm'
+import TodoList from './components/TodoList'
+
 function App() {
     const [todos, setTodos] = useState([
-        { id: 1, todo: '할일1', completed: true },
-        { id: 2, todo: '할일2', completed: true },
-        { id: 3, todo: '할일3', completed: false },
+        // { id: 1, todo: '할일1', completed: true },
+        // { id: 2, todo: '할일2', completed: false },
+        // { id: 3, todo: '할일3', completed: false },
     ])
-    let lastId = useRef(4)
-    //초기화값을 4로 설정
+    useEffect(() => {
+        fetch('https://dummyjson.com/todos')
+            .then((res) => res.json())
+            .then((res) => setTodos(res.todos))
+    }, [])
 
-    const handleOnSubmit = (e) => {
-        e.preventDefault() // 새로고침을 사전에 방지하는 것
-        const form = e.target
-        if (form.todo.value.length == 0) {
-            alert('할 일을 입력해 주세요!')
-            return
-        }
-        setTodos([...todos, { id: lastId.current, todo: form.todo.value, completed: false }])
-        lastId.current++
+    // let lastId = useRef(4)
+
+    const addTodo = (todo) => {
+        fetch('https://dummyjson.com/todos/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                todo,
+                completed: false,
+                userId: 5,
+            }),
+        })
+            .then((res) => res.json())
+            .then(console.log)
     }
 
-    const deleteTodo = (selectedID) => {
-        const nextState = todos.filter((item) => item.id !== selectedID)
+    const deleteTodo = (selectedId) => {
+        const nextState = todos.filter((item) => item.id !== selectedId)
         setTodos(nextState)
     }
 
-    const toggleTodo = (selectedID) => {
-        const nextState = todos.map((item) => (item.id == selectedID ? { ...item, completed: !item.completed } : item)) // 아닐 때는 원본 데이터 그대로 둬라
+    const toggleTodo = (selectedId) => {
+        const nextState = todos.map((item) => (item.id == selectedId ? { ...item, completed: !item.completed } : item))
         setTodos(nextState)
     }
 
     return (
         <>
-            <TodoForm handleOnSubmit={handleOnSubmit} />
-            <ul>
-                {todos.map((item) => (
-                    <li key={item.id} style={{ textDecoration: item.completed ? 'line-through' : 'none' }}>
-                        <input type="checkbox" checked={item.completed} onChange={() => toggleTodo(item.id)} />
-                        <span>
-                            {item.id} / {item.todo}
-                        </span>
-                        <button onClick={() => deleteTodo(item.id)}>X</button>
-                    </li>
-                ))}
-            </ul>
+            <TodoForm addTodo={addTodo} />
+            <TodoList todos={todos} deleteTodo={deleteTodo} toggleTodo={toggleTodo} />
         </>
     )
 }
